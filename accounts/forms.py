@@ -23,6 +23,8 @@ class TeamLeaderRegistrationForm(UserCreationForm):
     """
     Team leader registration form
     """
+    first_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'First Name'}))
+    last_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Last Name'}))
     email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'}))
     username = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Username'}))
     password1 = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password'}))
@@ -30,14 +32,17 @@ class TeamLeaderRegistrationForm(UserCreationForm):
     
     class Meta:
         model = User
-        fields = ('username', 'email', 'password1', 'password2')
+        fields = ('first_name', 'last_name', 'username', 'email', 'password1', 'password2')
     
     def save(self, commit=True):
         user = super().save(commit=False)
-        user.is_team_leader = True
+        user.first_name = self.cleaned_data.get('first_name')
+        user.last_name = self.cleaned_data.get('last_name')
+        user.user_type = 'TEAM_LEADER'  # Optional if you're setting roles
         if commit:
             user.save()
         return user
+
 
 class CustomAuthenticationForm(AuthenticationForm):
     """
@@ -74,10 +79,12 @@ class SeniorManagerRegistrationForm(UserCreationForm):
     
     class Meta:
         model = CustomUser
-        fields = ('username', 'email', 'first_name', 'last_name', 'password1', 'password2')
+        fields = ('first_name', 'last_name', 'username', 'email', 'password1', 'password2')
     
     def save(self, commit=True):
         user = super().save(commit=False)
+        user.first_name = self.cleaned_data.get('first_name')
+        user.last_name = self.cleaned_data.get('last_name')
         user.user_type = 'SENIOR_MANAGER'
         if commit:
             user.save()
@@ -87,6 +94,8 @@ class DepartmentLeaderRegistrationForm(UserCreationForm):
     """
     Department leader registration form
     """
+    first_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'First Name'}))
+    last_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Last Name'}))
     email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'}))
     username = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Username'}))
     password1 = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password'}))
@@ -95,10 +104,12 @@ class DepartmentLeaderRegistrationForm(UserCreationForm):
     
     class Meta:
         model = User
-        fields = ('username', 'email', 'password1', 'password2', 'department')
+        fields = ('first_name', 'last_name', 'username', 'email', 'password1', 'password2', 'department')
     
     def save(self, commit=True):
         user = super().save(commit=False)
+        user.first_name = self.cleaned_data.get('first_name')
+        user.last_name = self.cleaned_data.get('last_name')
         user.user_type = 'DEPARTMENT_LEADER'
         user.department = self.cleaned_data.get('department')
         if commit:
@@ -109,6 +120,8 @@ class EngineerRegistrationForm(UserCreationForm):
 
     """Engineer registration form"""
     
+    first_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'First Name'}))
+    last_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Last Name'}))
     email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'}))
     username = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Username'}))
     password1 = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password'}))
@@ -117,14 +130,17 @@ class EngineerRegistrationForm(UserCreationForm):
 
     class Meta:
         model = CustomUser
-        fields = ('username', 'email', 'password1', 'password2', 'team')
+        fields = ('first_name', 'last_name', 'username', 'email', 'password1', 'password2', 'team')
 
     def save(self, commit=True):
         user = super().save(commit=False)
-        user.user_type = 'ENGINEER'
+        user.first_name = self.cleaned_data.get('first_name')
+        user.last_name = self.cleaned_data.get('last_name')
+        user.user_type = 'TEAM_LEADER'  # Optional if you're setting roles
         if commit:
             user.save()
         return user
+
     
 
 class PasswordChangeForm(forms.Form):
