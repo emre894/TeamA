@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+
+{% block title %}Card Progress - Health Check{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-10">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Health Card Progress</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <p class="mb-0">
+                            <strong>Health Card:</strong> {{ health_card.name }}
+                        </p>
+                    </div>
+                    
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    {% if progress_data %}
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <h5 class="mb-3">Progress Over Time</h5>
+                                <div class="card">
+                                    <div class="card-body">
+                                        <canvas id="progressChart" height="300"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h5 class="mb-3">Session Details</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Session</th>
+                                                <th>Date</th>
+                                                <th>Status</th>
+                                                <th>Trend</th>
+                                                <th>Team</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for item in progress_data %}
+                                                <tr>
+                                                    <td>{{ item.session.name }}</td>
+                                                    <td>{{ item.session.start_date|date:"M d, Y" }}</td>
+                                                    <td>
+                                                        <div class="progress" style="height: 20px; width: 100px;">
+                                                            <div class="progress-bar bg-danger" role="progressbar" style="width: {{ item.red_percentage }}%" title="Red: {{ item.red_count }}"></div>
+                                                            <div class="progress-bar bg-warning" role="progressbar" style="width: {{ item.amber_percentage }}%" title="Amber: {{ item.amber_count }}"></div>
+                                                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ item.green_percentage }}%" title="Green: {{ item.green_count }}"></div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="progress" style="height: 20px; width: 100px;">
+                                                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ item.better_percentage }}%" title="Better: {{ item.better_count }}"></div>
+                                                            <div class="progress-bar bg-secondary" role="progressbar" style="width: {{ item.same_percentage }}%" title="Same: {{ item.same_count }}"></div>
+                                                            <div class="progress-bar bg-danger" role="progressbar" style="width: {{ item.worse_percentage }}%" title="Worse: {{ item.worse_count }}"></div>
+                                                        </div>
+                                                    </td>
+                                                    <td>{{ item.team.name }}</td>
+                                                    <td>
+                                                        <a href="{% url 'team_summary' session_id=item.session.id team_id=item.team.id %}" class="btn btn-sm btn-outline-primary">View Summary</a>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning">
+                            <p class="mb-0">No progress data available for this health card yet.</p>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">Back to Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if progress_data %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('progressChart').getContext('2d');
+    
+    const sessions = [{% for item in progress_data %}'{{ item.session.name }}',{% endfor %}];
+    const redData = [{% for item in progress_data %}{{ item.red_percentage }},{% endfor %}];
+    const amberData = [{% for item in progress_data %}{{ item.amber_percentage }},{% endfor %}];
+    const greenData = [{% for item in progress_data %}{{ item.green_percentage }},{% endfor %}];
+    const betterData = [{% for item in progress_data %}{{ item.better_percentage }},{% endfor %}];
+    const sameData = [{% for item in progress_data %}{{ item.same_percentage }},{% endfor %}];
+    const worseData = [{% for item in progress_data %}{{ item.worse_percentage }},{% endfor %}];
+    
+    const progressChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: sessions,
+            datasets: [
+                {
+                    label: 'Red',
+                    data: redData,
+                    borderColor: '#dc3545',
+                    backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                    tension: 0.1
+                },
+                {
+                    label: 'Amber',
+                    data: amberData,
+                    borderColor: '#ffc107',
+                    backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                    tension: 0.1
+                },
+                {
+                    label: 'Green',
+                    data: greenData,
+                    borderColor: '#198754',
+                    backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                    tension: 0.1
+                },
+                {
+                    label: 'Better',
+                    data: betterData,
+                    borderColor: '#20c997',
+                    backgroundColor: 'rgba(32, 201, 151, 0.1)',
+                    tension: 0.1,
+                    hidden: true
+                },
+                {
+                    label: 'Same',
+                    data: sameData,
+                    borderColor: '#6c757d',
+                    backgroundColor: 'rgba(108, 117, 125, 0.1)',
+                    tension: 0.1,
+                    hidden: true
+                },
+                {
+                    label: 'Worse',
+                    data: worseData,
+                    borderColor: '#d63384',
+                    backgroundColor: 'rgba(214, 51, 132, 0.1)',
+                    tension: 0.1,
+                    hidden: true
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: '{{ health_card.name }} - Progress Over Time',
+                    font: {
+                        size: 16
+                    }
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false
+                },
+                legend: {
+                    position: 'top',
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    title: {
+                        display: true,
+                        text: 'Percentage'
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endif %}
+{% endblock %}

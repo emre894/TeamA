@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block title %}Vote on Health Cards - Health Check{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-10">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Health Cards Voting</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <p class="mb-0">
+                            <strong>Session:</strong> {{ session.name }} | 
+                            <strong>Team:</strong> {{ team.name }}
+                        </p>
+                    </div>
+                    
+                    <div class="alert alert-secondary">
+                        <h5 class="alert-heading">How to Vote</h5>
+                        <p>For each health card, select a status and trend:</p>
+                        <ul>
+                            <li><strong>Status:</strong> Red (needs improvement), Amber (needs attention), Green (good)</li>
+                            <li><strong>Trend:</strong> Getting Better, Same, Getting Worse</li>
+                        </ul>
+                        <p class="mb-0">You can also add optional comments to provide more context.</p>
+                    </div>
+                    
+                    {% if messages %}
+                        <div class="messages">
+                            {% for message in messages %}
+                                <div class="alert alert-{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    
+                    <div class="accordion" id="healthCardsAccordion">
+                        {% for card, form in card_forms %}
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading{{ card.id }}">
+                                    <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ card.id }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" aria-controls="collapse{{ card.id }}">
+                                        {{ card.name }}
+                                    </button>
+                                </h2>
+                                <div id="collapse{{ card.id }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" aria-labelledby="heading{{ card.id }}" data-bs-parent="#healthCardsAccordion">
+                                    <div class="accordion-body">
+                                        <p>{{ card.description }}</p>
+                                        
+                                        <form method="post" action="{% url 'healthcards:vote_cards' session_id=session.id team_id=team.id %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="card_id" value="{{ card.id }}">
+                                            
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Status:</label>
+                                                    <div class="d-flex gap-3">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" name="status" id="status_red_{{ card.id }}" value="red" {% if card.user_vote.status == 'red' %}checked{% endif %} required>
+                                                            <label class="form-check-label" for="status_red_{{ card.id }}">
+                                                                <i class="fas fa-circle status-red"></i> Red
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" name="status" id="status_amber_{{ card.id }}" value="amber" {% if card.user_vote.status == 'amber' %}checked{% endif %} required>
+                                                            <label class="form-check-label" for="status_amber_{{ card.id }}">
+                                                                <i class="fas fa-circle status-amber"></i> Amber
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" name="status" id="status_green_{{ card.id }}" value="green" {% if card.user_vote.status == 'green' %}checked{% endif %} required>
+                                                            <label class="form-check-label" for="status_green_{{ card.id }}">
+                                                                <i class="fas fa-circle status-green"></i> Green
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Trend:</label>
+                                                    <div class="d-flex gap-3">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" name="trend" id="trend_better_{{ card.id }}" value="better" {% if card.user_vote.trend == 'better' %}checked{% endif %} required>
+                                                            <label class="form-check-label" for="trend_better_{{ card.id }}">
+                                                                <i class="fas fa-arrow-up text-success"></i> Better
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" name="trend" id="trend_same_{{ card.id }}" value="same" {% if card.user_vote.trend == 'same' %}checked{% endif %} required>
+                                                            <label class="form-check-label" for="trend_same_{{ card.id }}">
+                                                                <i class="fas fa-equals text-secondary"></i> Same
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" name="trend" id="trend_worse_{{ card.id }}" value="worse" {% if card.user_vote.trend == 'worse' %}checked{% endif %} required>
+                                                            <label class="form-check-label" for="trend_worse_{{ card.id }}">
+                                                                <i class="fas fa-arrow-down text-danger"></i> Worse
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <label for="comment_{{ card.id }}" class="form-label">Comments (optional):</label>
+                                                <textarea class="form-control" id="comment_{{ card.id }}" name="comment" rows="3">{{ card.user_vote.comment }}</textarea>
+                                            </div>
+                                            
+                                            <div class="d-grid">
+                                                <button type="submit" class="btn btn-primary">Save Vote</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="card-footer d-flex justify-content-between">
+                    <a href="{% url 'healthcards:select_team' session_id=session.id %}" class="btn btn-outline-secondary">Back to Team Selection</a>
+                    <a href="{% url 'healthcards:team_summary' session_id=session.id team_id=team.id %}" class="btn btn-outline-primary">View Team Summary</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

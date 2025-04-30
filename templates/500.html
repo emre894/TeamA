@@ -1,0 +1,14 @@
+{% extends 'error.html' %}
+
+{% block title %}Server Error - Health Check{% endblock %}
+
+{% block content %}
+{{ block.super }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelector('h3.card-title').textContent = 'Server Error';
+        document.querySelector('h2').textContent = '500';
+        document.querySelector('p.lead').textContent = 'Sorry, an error occurred on the server.';
+    });
+</script>
+{% endblock %} 

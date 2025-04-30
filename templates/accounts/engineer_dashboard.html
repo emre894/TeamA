@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Welcome, {{ user.username }}!</h2>
+<p>This is your Engineer Dashboard.</p>
+<a href="{% url 'healthcards:select_session' %}">Start Health Check</a>
+{% endblock %}

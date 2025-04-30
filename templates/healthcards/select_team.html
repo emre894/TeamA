@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Select Team - Health Check{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Select Team</h4>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    <div class="alert alert-info">
+                        <p class="mb-0">
+                            <strong>Session:</strong> {{ session.name }} 
+                            <span class="badge {% if session.is_active %}bg-success{% else %}bg-secondary{% endif %}">
+                                {% if session.is_active %}Active{% else %}Inactive{% endif %}
+                            </span>
+                        </p>
+                    </div>
+                    
+                    {% if teams %}
+                        <div class="list-group">
+                            {% for team in teams %}
+                                <a href="{% url 'healthcards:vote_cards' session_id=session.id team_id=team.id %}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">{{ team.name }}</h5>
+                                    </div>
+                                    {% if team.description %}
+                                        <p class="mb-1">{{ team.description }}</p>
+                                    {% endif %}
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning">
+                            <p class="mb-0">No teams available. Please contact your administrator.</p>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'healthcards:select_session' %}" class="btn btn-outline-secondary">Back to Sessions</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

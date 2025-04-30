@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}My Votes - Health Check{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-10">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">My Voting History</h4>
+                </div>
+                <div class="card-body">
+                    {% if votes %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Health Card</th>
+                                        <th>Status</th>
+                                        <th>Trend</th>
+                                        <th>Team</th>
+                                        <th>Session</th>
+                                        <th>Date</th>
+                                        <th>Comments</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for vote in votes %}
+                                    <tr>
+                                        <td>{{ vote.health_card.name }}</td>
+                                        <td>
+                                            <span class="badge bg-{% if vote.status == 'red' %}danger{% elif vote.status == 'amber' %}warning{% else %}success{% endif %}">
+                                                {{ vote.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% if vote.trend == 'better' %}
+                                                <i class="fas fa-arrow-up text-success"></i>
+                                            {% elif vote.trend == 'same' %}
+                                                <i class="fas fa-equals text-secondary"></i>
+                                            {% else %}
+                                                <i class="fas fa-arrow-down text-danger"></i>
+                                            {% endif %}
+                                            {{ vote.get_trend_display }}
+                                        </td>
+                                        <td>{{ vote.team.name }}</td>
+                                        <td>{{ vote.session.name }}</td>
+                                        <td>{{ vote.updated_at|date:"M d, Y" }}</td>
+                                        <td>{% if vote.comment %}{{ vote.comment }}{% else %}-{% endif %}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <p class="mb-0">You haven't submitted any votes yet.</p>
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="{% url 'healthcards:select_session' %}" class="btn btn-primary">Start Health Check</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

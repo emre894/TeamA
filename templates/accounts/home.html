@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Health Check{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 text-center mb-5">
+        <h1 class="display-4">SKY Health Check</h1>
+        <p class="lead">Measure and monitor your team's health</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 class="card-title">What is Health Check?</h2>
+                <p class="card-text">
+                    Health Check is a technique developed by Sky and used to assess the health of teams. 
+                    Engineering teams discuss and rate the health of critical areas in the team's operations 
+                    (Code Base Health, Testing, Release Processes, Stakeholder Relations, etc.).
+                </p>
+                <p class="card-text">
+                    This application is designed to record, visualize, and track the progress of teams' health status over time.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 class="card-title">How It Works</h2>
+                <ol>
+                    <li>Team members vote red, amber, or green for each health card.</li>
+                    <li>Progress trend (getting better, same, getting worse) is indicated for each card.</li>
+                    <li>Team leaders visualize team performance and track progress over time.</li>
+                </ol>
+                <div class="d-flex justify-content-around mt-4">
+                    <div class="text-center">
+                        <i class="fas fa-circle status-red fa-3x"></i>
+                        <p class="mt-2">Red</p>
+                        <small>Improvement needed</small>
+                    </div>
+                    <div class="text-center">
+                        <i class="fas fa-circle status-amber fa-3x"></i>
+                        <p class="mt-2">Amber</p>
+                        <small>Needs attention</small>
+                    </div>
+                    <div class="text-center">
+                        <i class="fas fa-circle status-green fa-3x"></i>
+                        <p class="mt-2">Green</p>
+                        <small>Good condition</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12 text-center">
+        {% if user.is_authenticated %}
+        {% if user.user_type == "ENGINEER" or user.user_type == "TEAM_LEADER" %}
+            <a href="{% url 'healthcards:select_session' %}" class="btn btn-primary btn-lg">Start Health Check</a>
+        {% else %}
+            <p class="text-muted">You are logged in as {{ user.user_type|title }}. No voting access.</p>
+            <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary btn-lg">Go to Dashboard</a>
+        {% endif %}
+            {% else %}
+            <div class="d-flex flex-column align-items-center gap-3">
+                <div class="d-flex gap-3">
+                    <a href="{% url 'login' %}" class="btn btn-primary btn-lg">Login</a>
+
+                    <div class="dropdown">
+                        <button class="btn btn-outline-primary btn-lg dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            Register
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'register_engineer' %}">Register as Engineer</a></li>
+                            <li><a class="dropdown-item" href="{% url 'register_team_leader' %}">Register as Team Leader</a></li>
+                            <li><a class="dropdown-item" href="{% url 'register_department_leader' %}">Register as Department Leader</a></li>
+                            <li><a class="dropdown-item" href="{% url 'register_senior_manager' %}">Register as Senior Manager</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <small class="text-muted mt-2 d-block">
+                    Admin? <a href="/admin/">Click here for admin login</a>
+                </small>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

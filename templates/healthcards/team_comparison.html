@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+
+{% block title %}Team Comparison - Health Check{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-10">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Team Comparison</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <p class="mb-0">
+                            <strong>Session:</strong> {{ session.name }} | 
+                            <strong>Teams:</strong> {{ teams_count }} | 
+                            <strong>Total Votes:</strong> {{ total_votes }}
+                        </p>
+                    </div>
+                    
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    {% if comparison_data %}
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <h5 class="mb-3">Overall Health Status by Team</h5>
+                                <div class="card">
+                                    <div class="card-body">
+                                        <canvas id="teamComparisonChart" height="300"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h5 class="mb-3">Team Details</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Team</th>
+                                                <th>Status</th>
+                                                <th>Votes</th>
+                                                <th>Trend</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for item in comparison_data %}
+                                                <tr>
+                                                    <td>{{ item.team.name }}</td>
+                                                    <td>
+                                                        <div class="progress" style="height: 20px; width: 100px;">
+                                                            <div class="progress-bar bg-danger" role="progressbar" style="width: {{ item.red_percentage }}%" title="Red: {{ item.red_count }}"></div>
+                                                            <div class="progress-bar bg-warning" role="progressbar" style="width: {{ item.amber_percentage }}%" title="Amber: {{ item.amber_count }}"></div>
+                                                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ item.green_percentage }}%" title="Green: {{ item.green_count }}"></div>
+                                                        </div>
+                                                    </td>
+                                                    <td>{{ item.total_votes }}</td>
+                                                    <td>
+                                                        <div class="progress" style="height: 20px; width: 100px;">
+                                                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ item.better_percentage }}%" title="Better: {{ item.better_count }}"></div>
+                                                            <div class="progress-bar bg-secondary" role="progressbar" style="width: {{ item.same_percentage }}%" title="Same: {{ item.same_count }}"></div>
+                                                            <div class="progress-bar bg-danger" role="progressbar" style="width: {{ item.worse_percentage }}%" title="Worse: {{ item.worse_count }}"></div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <a href="{% url 'team_summary' session_id=session.id team_id=item.team.id %}" class="btn btn-sm btn-outline-primary">View Summary</a>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-md-12">
+                                <h5 class="mb-3">Health Cards Comparison</h5>
+                                <div class="accordion" id="healthCardsAccordion">
+                                    {% for card in health_cards %}
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header" id="heading{{ card.id }}">
+                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ card.id }}" aria-expanded="false" aria-controls="collapse{{ card.id }}">
+                                                    {{ card.name }}
+                                                </button>
+                                            </h2>
+                                            <div id="collapse{{ card.id }}" class="accordion-collapse collapse" aria-labelledby="heading{{ card.id }}" data-bs-parent="#healthCardsAccordion">
+                                                <div class="accordion-body">
+                                                    <p>{{ card.description }}</p>
+                                                    
+                                                    <div class="table-responsive">
+                                                        <table class="table table-sm">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Team</th>
+                                                                    <th>Status</th>
+                                                                    <th>Trend</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                {% for team_data in card.team_data %}
+                                                                    <tr>
+                                                                        <td>{{ team_data.team.name }}</td>
+                                                                        <td>
+                                                                            <div class="progress" style="height: 20px; width: 100px;">
+                                                                                <div class="progress-bar bg-danger" role="progressbar" style="width: {{ team_data.red_percentage }}%" title="Red: {{ team_data.red_count }}"></div>
+                                                                                <div class="progress-bar bg-warning" role="progressbar" style="width: {{ team_data.amber_percentage }}%" title="Amber: {{ team_data.amber_count }}"></div>
+                                                                                <div class="progress-bar bg-success" role="progressbar" style="width: {{ team_data.green_percentage }}%" title="Green: {{ team_data.green_count }}"></div>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div class="progress" style="height: 20px; width: 100px;">
+                                                                                <div class="progress-bar bg-success" role="progressbar" style="width: {{ team_data.better_percentage }}%" title="Better: {{ team_data.better_count }}"></div>
+                                                                                <div class="progress-bar bg-secondary" role="progressbar" style="width: {{ team_data.same_percentage }}%" title="Same: {{ team_data.same_count }}"></div>
+                                                                                <div class="progress-bar bg-danger" role="progressbar" style="width: {{ team_data.worse_percentage }}%" title="Worse: {{ team_data.worse_count }}"></div>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                {% endfor %}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                    
+                                                    <div class="mt-3">
+                                                        <a href="{% url 'card_progress' card_id=card.id %}" class="btn btn-sm btn-outline-primary">View Card Progress</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning">
+                            <p class="mb-0">No comparison data available for this session yet.</p>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'select_session' %}" class="btn btn-outline-secondary">Back to Sessions</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if comparison_data %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('teamComparisonChart').getContext('2d');
+    
+    const teams = [{% for item in comparison_data %}'{{ item.team.name }}',{% endfor %}];
+    const redData = [{% for item in comparison_data %}{{ item.red_percentage }},{% endfor %}];
+    const amberData = [{% for item in comparison_data %}{{ item.amber_percentage }},{% endfor %}];
+    const greenData = [{% for item in comparison_data %}{{ item.green_percentage }},{% endfor %}];
+    
+    const teamComparisonChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: teams,
+            datasets: [
+                {
+                    label: 'Red',
+                    data: redData,
+                    backgroundColor: 'rgba(220, 53, 69, 0.8)',
+                    stack: 'Stack 0'
+                },
+                {
+                    label: 'Amber',
+                    data: amberData,
+                    backgroundColor: 'rgba(255, 193, 7, 0.8)',
+                    stack: 'Stack 0'
+                },
+                {
+                    label: 'Green',
+                    data: greenData,
+                    backgroundColor: 'rgba(25, 135, 84, 0.8)',
+                    stack: 'Stack 0'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Team Health Status Comparison',
+                    font: {
+                        size: 16
+                    }
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false
+                },
+                legend: {
+                    position: 'top',
+                }
+            },
+            scales: {
+                x: {
+                    stacked: true,
+                },
+                y: {
+                    stacked: true,
+                    beginAtZero: true,
+                    max: 100,
+                    title: {
+                        display: true,
+                        text: 'Percentage'
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endif %}
+{% endblock %} 

@@ -1,0 +1,14 @@
+{% extends 'error.html' %}
+
+{% block title %}Access Denied - Health Check{% endblock %}
+
+{% block content %}
+{{ block.super }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelector('h3.card-title').textContent = 'Access Denied';
+        document.querySelector('h2').textContent = '403';
+        document.querySelector('p.lead').textContent = 'You do not have permission to access this page.';
+    });
+</script>
+{% endblock %} 

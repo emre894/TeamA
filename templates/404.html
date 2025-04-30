@@ -1,0 +1,14 @@
+{% extends 'error.html' %}
+
+{% block title %}Page Not Found - Health Check{% endblock %}
+
+{% block content %}
+{{ block.super }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelector('h3.card-title').textContent = 'Page Not Found';
+        document.querySelector('h2').textContent = '404';
+        document.querySelector('p.lead').textContent = 'The page you are looking for could not be found.';
+    });
+</script>
+{% endblock %} 
