@@ -1,4 +1,4 @@
-# Health Check Application
+# Health Check Application (Team A)
 
 This is a web-based platform designed to record and visualize software product development operations using Spotify's Health Check technique.
 
