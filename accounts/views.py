@@ -35,13 +35,16 @@ def register_team_leader(request):
     if request.method == 'POST':
         form = TeamLeaderRegistrationForm(request.POST)
         if form.is_valid():
-            user = form.save()
+            user = form.save()  # <-- This should trigger the custom save()
             login(request, user)
             messages.success(request, 'Team leader registration successful!')
             return redirect('team_leader_dashboard')
     else:
         form = TeamLeaderRegistrationForm()
-    return render(request, 'accounts/register.html', {'form': form, 'user_type': 'team_leader'})
+    return render(request, 'accounts/register.html', {
+        'form': form,
+        'user_type': 'team_leader'
+    })
 
 def login_view(request):
     """

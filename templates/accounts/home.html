@@ -14,14 +14,16 @@
     <div class="col-md-6">
         <div class="card mb-4">
             <div class="card-body">
-                <h2 class="card-title">What is Health Check?</h2>
+                <h2 class="card-title">About the Project</h2>
                 <p class="card-text">
-                    Health Check is a technique developed by Sky and used to assess the health of teams. 
-                    Engineering teams discuss and rate the health of critical areas in the team's operations 
-                    (Code Base Health, Testing, Release Processes, Stakeholder Relations, etc.).
+                    This web application was developed for SKY's Engineering Department to support team health assessments as part of the software development group project.
                 </p>
                 <p class="card-text">
-                    This application is designed to record, visualize, and track the progress of teams' health status over time.
+                    It provides a structured, digital alternative to spreadsheet-based health checks, allowing teams to vote on key areas and enabling leaders to track progress and trends over time.
+                </p>                
+                <p class="card-text">
+                    This application is designed to record, visualize, and track the progress of teams' health status
+                    over time.
                 </p>
             </div>
         </div>
@@ -61,33 +63,37 @@
     <div class="col-md-12 text-center">
         {% if user.is_authenticated %}
         {% if user.user_type == "ENGINEER" or user.user_type == "TEAM_LEADER" %}
-            <a href="{% url 'healthcards:select_session' %}" class="btn btn-primary btn-lg">Start Health Check</a>
+        <a href="{% url 'healthcards:select_session' %}" class="btn btn-primary btn-lg">Start Health Check</a>
         {% else %}
-            <p class="text-muted">You are logged in as {{ user.user_type|title }}. No voting access.</p>
-            <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary btn-lg">Go to Dashboard</a>
+        <p class="text-muted">You are logged in as {{ user.user_type|title }}. No voting access.</p>
+        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary btn-lg">Go to Dashboard</a>
         {% endif %}
-            {% else %}
-            <div class="d-flex flex-column align-items-center gap-3">
-                <div class="d-flex gap-3">
-                    <a href="{% url 'login' %}" class="btn btn-primary btn-lg">Login</a>
+        {% else %}
+        <div class="d-flex flex-column align-items-center gap-3">
+            <div class="d-flex gap-3">
+                <a href="{% url 'login' %}" class="btn btn-primary btn-lg">Login</a>
 
-                    <div class="dropdown">
-                        <button class="btn btn-outline-primary btn-lg dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                            Register
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{% url 'register_engineer' %}">Register as Engineer</a></li>
-                            <li><a class="dropdown-item" href="{% url 'register_team_leader' %}">Register as Team Leader</a></li>
-                            <li><a class="dropdown-item" href="{% url 'register_department_leader' %}">Register as Department Leader</a></li>
-                            <li><a class="dropdown-item" href="{% url 'register_senior_manager' %}">Register as Senior Manager</a></li>
-                        </ul>
-                    </div>
+                <div class="dropdown">
+                    <button class="btn btn-outline-primary btn-lg dropdown-toggle" type="button"
+                        data-bs-toggle="dropdown">
+                        Register
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{% url 'register_engineer' %}">Register as Engineer</a></li>
+                        <li><a class="dropdown-item" href="{% url 'register_team_leader' %}">Register as Team Leader</a>
+                        </li>
+                        <li><a class="dropdown-item" href="{% url 'register_department_leader' %}">Register as
+                                Department Leader</a></li>
+                        <li><a class="dropdown-item" href="{% url 'register_senior_manager' %}">Register as Senior
+                                Manager</a></li>
+                    </ul>
                 </div>
-
-                <small class="text-muted mt-2 d-block">
-                    Admin? <a href="/admin/">Click here for admin login</a>
-                </small>
             </div>
+
+            <small class="text-muted mt-2 d-block">
+                Admin? <a href="/admin/">Click here for admin login</a>
+            </small>
+        </div>
         {% endif %}
     </div>
 </div>
